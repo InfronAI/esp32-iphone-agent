@@ -100,7 +100,9 @@
         stamp.textContent = Math.floor(time / 60) + ':' + String(Math.floor(time % 60)).padStart(2, '0');
         button.append(stamp, names[key]);
         button.addEventListener('click', async () => {
-          try { video.currentTime = time; await video.play(); } catch { error.hidden = false; }
+          error.hidden = true;
+          try { video.currentTime = time; await video.play(); }
+          catch (cause) { if (cause.name !== 'AbortError') error.hidden = false; }
         });
         item.append(button); document.getElementById('chapters').append(item); buttons.push(button);
       }

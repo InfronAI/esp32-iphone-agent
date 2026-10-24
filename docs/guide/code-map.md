@@ -6,7 +6,6 @@
 esp32-iphone-agent/
 ├── README.md / README.zh-CN.md          项目入口与当前方案
 ├── NOTICE.md / LICENSE                 来源与许可
-├── .github/workflows/ci.yml             iOS、固件、主机测试与旧 server CI
 ├── hardware/
 │   ├── flash.sh                        Arduino CLI 构建/烧录，--cloud 选择当前模式
 │   ├── hid_bridge/
@@ -66,8 +65,9 @@ esp32-iphone-agent/
 ├── prompts/                           旧 iPhone Agent 的提示词
 ├── server/                            历史 Python 电脑端服务与测试
 ├── tools/demo/                        可重复生成 Demo 的脚本与 Node 依赖锁
+├── tools/ci/                          GitHub Actions 测试工作流模板
 ├── docs/guide/                        当前完整指南与历史 README
-├── docs/demo/                         公开 MP4、海报、字幕/章节、演示说明
+├── docs/demo/                         在线播放器、公开 MP4、海报、章节、演示说明
 └── build/                             本地编译、测试、私有诊断产物，Git 忽略
 ```
 
