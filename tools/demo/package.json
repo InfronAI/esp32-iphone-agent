@@ -1,0 +1,9 @@
+{
+  "name": "esp32-agent-demo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Reproducible, explicitly simulated recording of the real ESP32 dashboard",
+  "scripts": {"test:web": "node test-web.cjs", "record": "node record-demo.cjs"},
+  "devDependencies": {"playwright": "1.63.0"},
+  "engines": {"node": ">=20"}
+}

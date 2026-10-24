@@ -1,0 +1,20 @@
+The openh264/ headers and license come from Cisco OpenH264 v2.6.0, commit
+652bdb7719f30b52b08e506645a7322ff1b2cc6f (BSD-2-Clause).
+https://github.com/cisco/openh264
+
+hardware/tools/cloud_deps.py verifies the pinned source archive SHA-256 and
+cross-compiles the decoder and common C++ sources with the selected Arduino
+ESP32-S3 toolchain. It applies small ESP-IDF thread-platform adaptations and
+fixes two int/int32_t definition mismatches on Xtensa. Assembly optimizations
+and decoder worker threads are disabled. Generated objects, sources, and the
+static library are cached under hardware/build, not checked in.
+Decoder buffers explicitly use PSRAM to preserve internal RAM for networking;
+failed allocations log the requested size and largest remaining PSRAM block.
+Initial compressed-stream storage is reduced from 3 MiB to 768 KiB, matching
+the application's 256 KiB per-access-unit input limit. Decoder error codes,
+failed allocation size, and SPS/PPS configuration are available in API status.
+
+This experimental port accepts Baseline/Main/High H.264 SPS profiles and
+produces grayscale JPEG from the decoder's luma plane. Stream compatibility,
+memory use, and speed must be validated on the actual board. HEVC is not
+supported. No screenshot is published after a decode error or queue overflow.

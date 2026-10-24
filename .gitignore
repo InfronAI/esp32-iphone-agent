@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.egg-info/
+.venv/
+.pytest_cache/
+.ruff_cache/
+
+# Local config and secrets
+.env
+hardware/hid_bridge/secrets.h
+
+# Build output
+/build/
+hardware/build/
+hardware/hid_bridge/build/
+
+# Editors and OS
+.DS_Store
+.idea/
+.vscode/
+
+# Host test output
+hardware/tests/test
+hardware/tests/test.dSYM/
+hardware/tests/test_cloud
+hardware/tests/test_cloud.dSYM/
+hardware/tools/out/
+
+# Demo tooling dependencies and private signing material
+tools/demo/node_modules/
+*.p12
+*.mobileprovision
