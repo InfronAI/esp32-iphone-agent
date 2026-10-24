@@ -5,7 +5,7 @@
 
 **让 ESP32-S3 围绕一个 Goal，持续观察、决策、操作并验证结果。**
 
-[English](README.md) · [在线观看 Demo](https://infronai.github.io/esp32-iphone-agent/demo/) · [项目文档概览](#项目文档概览)
+[English](README.md) · [观看 Demo](#在线演示与验证边界) · [项目文档概览](#项目文档概览)
 
 </div>
 
@@ -30,9 +30,10 @@ iPhone App 负责配置引导和任务提交，网页负责展示手机画面与
 
 ## 在线演示与验证边界
 
-[![网页控制台与 Goal 循环演示](docs/demo/poster.jpg)](https://infronai.github.io/esp32-iphone-agent/demo/)
+https://github.com/user-attachments/assets/9aca96ee-38b1-4d52-847c-96a08fae530e
 
-**[▶ 在线播放 71 秒 Demo](https://infronai.github.io/esp32-iphone-agent/demo/)**：支持播放、暂停、拖动进度、全屏与 9 个章节跳转，无需下载文件。
+点击上方视频的**播放按钮**，即可直接在 README 首页观看 71 秒 Demo，支持暂停、拖动进度与全屏。
+需要按章节浏览时，可打开[独立播放器](https://infronai.github.io/esp32-iphone-agent/demo/)，使用 9 个章节跳转。
 
 视频使用**真实网页代码与模拟手机画面、任务响应**，展示登录、监控、目标执行、完成复核、重规划、停止和模型配置。
 它不是实机 iPhone USB HID 操控成功的录像；视频和播放器均有明确标识。

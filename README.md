@@ -5,7 +5,7 @@
 
 **An ESP32-S3-powered iPhone automation agent with a goal-driven execution loop.**
 
-[简体中文](README.zh-CN.md) · [Watch demo online](https://infronai.github.io/esp32-iphone-agent/demo/) · [Documentation](#documentation)
+[简体中文](README.zh-CN.md) · [Watch demo](#demo-and-validation-boundary) · [Documentation](#documentation)
 
 </div>
 
@@ -34,10 +34,10 @@ flashing and optional monitoring; it does not run the current agent or decode it
 
 ## Demo and validation boundary
 
-[![Dashboard demo — simulated phone task](docs/demo/poster.jpg)](https://infronai.github.io/esp32-iphone-agent/demo/)
+https://github.com/user-attachments/assets/9aca96ee-38b1-4d52-847c-96a08fae530e
 
-**[▶ Watch the 71-second demo online](https://infronai.github.io/esp32-iphone-agent/demo/)** —
-play, pause, seek, switch to full screen or jump between nine chapters without downloading a file.
+Press **Play** above to watch the 71-second demo directly in this README.
+For nine chapter shortcuts, [open the standalone player](https://infronai.github.io/esp32-iphone-agent/demo/).
 
 The video records the **actual dashboard with simulated phone screens and task responses**.
 It shows login, monitoring, Goal execution, completion checks, replanning, stopping and model

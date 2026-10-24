@@ -25,6 +25,14 @@
 播放器源码为 `docs/demo/index.html`。GitHub Pages 从 `main` 分支的 `/docs` 发布，`docs/.nojekyll` 保留静态文件原样。
 修改页面、视频或章节后推送至 `main`，等待 Pages 部署完成即可更新；这个发布流程与 `tools/ci` 中尚未启用的测试工作流分开。
 
+## README 内嵌视频
+
+中英文 README 使用同一份 GitHub 原生视频附件，在仓库首页直接显示播放器；独立网页继续提供章节导航。
+重新生成 `demo.mp4` 后，需要重新上传视频附件，并更新两份 README 中单独成段的附件 URL。
+仅覆盖仓库里的 MP4 会更新 GitHub Pages 视频，不会替换已有的附件。
+
+附件上传方式见 [GitHub 官方说明](https://docs.github.com/en/github-cli/github-cli/attaching-files-with-github-cli)。
+
 ## 重录
 
 需要 Node.js 20+、ffmpeg，以及 Playwright Chromium 或本机 Google Chrome：
