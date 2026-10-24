@@ -11,7 +11,6 @@
 7. [使用手册](manual.md)：日常操作、示例、模型设置、排障。
 8. [验证与已知限制](validation.md)：已测结果和未完成的真机验证。
 9. [Demo](../demo/README.md)：演示视频和可重复录制的方法。
-10. [研究性项目开源发布 Playbook](../playbooks/research-open-source-release.md)：从事实核对、双语文档、分语言视频到 GitHub 发布与线上验收的可复用流程。
 
 [上游旧版英文说明](upstream-readme.en.md)和[中文版](upstream-readme.zh-CN.md)属于历史资料。
 `docs/ble-protocol.md`、早期运行记录与导出指南也主要描述旧版；当前 App 不执行旧的 BLE / iPhone AgentLoop。

@@ -201,7 +201,6 @@ ios/
   IPhoneAgentTests/                iOS 单元测试
 shared/task-examples.json           网页与 App 示例任务的共享源
 docs/guide/                        完整指南和验证记录
-docs/playbooks/                    可复用的研究性项目开源发布流程
 docs/demo/                         在线播放器、MP4、海报和章节
 tools/demo/                        可重复录制 Demo 的工具
 tools/ci/                          可选 GitHub Actions 测试工作流模板
@@ -289,10 +288,7 @@ App 最低目标为 iOS 18，但构建当前设置跳转代码需要包含 iOS 2
 [业务流程](docs/guide/workflow.md) · [数据流与 API](docs/guide/data-flow.md) ·
 [代码地图](docs/guide/code-map.md) · [安装方法](docs/guide/install.md) ·
 [使用手册](docs/guide/manual.md) · [验证记录](docs/guide/validation.md) ·
-[Demo 重录](docs/demo/README.md) ·
-[研究性项目开源发布 Playbook](docs/playbooks/research-open-source-release.md)
-
-Playbook 将本次发布整理为可复用步骤，涵盖事实与验证边界、公开文件审查、双语首页、分语言 Demo、GitHub 发布和匿名播放验收，并附交付记录模板。
+[Demo 重录](docs/demo/README.md)
 
 ## 来源与许可
 

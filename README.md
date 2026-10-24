@@ -224,7 +224,6 @@ ios/
   IPhoneAgentTests/                iOS unit tests
 shared/task-examples.json           Shared source for web and iPhone task examples
 docs/guide/                        Full guides and validation records
-docs/playbooks/                    Reusable research-project publication workflow
 docs/demo/                         Online player, MP4, poster and chapters
 tools/demo/                        Reproducible demo recording tools
 tools/ci/                          Optional GitHub Actions test workflow template
@@ -321,11 +320,7 @@ GitHub Pages publishes the online video separately.
 [Business flow](docs/guide/workflow.md) · [Data flow and API](docs/guide/data-flow.md) ·
 [Code map](docs/guide/code-map.md) · [Installation](docs/guide/install.md) ·
 [User manual](docs/guide/manual.md) · [Validation](docs/guide/validation.md) ·
-[Demo reproduction](docs/demo/README.md) ·
-[Research open-source publication playbook (Chinese)](docs/playbooks/research-open-source-release.md)
-
-The publication playbook captures fact checking, safe file selection, bilingual documentation,
-localized demos, GitHub publishing, and anonymous playback checks, with a reusable delivery template.
+[Demo reproduction](docs/demo/README.md)
 
 ## Source and licensing
 
