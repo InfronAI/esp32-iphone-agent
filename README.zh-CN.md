@@ -33,7 +33,7 @@ iPhone App 负责配置引导和任务提交，网页负责展示手机画面与
 https://github.com/user-attachments/assets/9aca96ee-38b1-4d52-847c-96a08fae530e
 
 点击上方视频的**播放按钮**，即可直接在 README 首页观看 71 秒 Demo，支持暂停、拖动进度与全屏。
-需要按章节浏览时，可打开[独立播放器](https://infronai.github.io/esp32-iphone-agent/demo/)，使用 9 个章节跳转。
+需要按章节浏览时，可打开[中文独立播放器](https://infronai.github.io/esp32-iphone-agent/demo/?lang=zh-CN)，使用 9 个章节跳转；[英文版](https://infronai.github.io/esp32-iphone-agent/demo/?lang=en)的界面、字幕和任务日志均已英文化。
 
 视频使用**真实网页代码与模拟手机画面、任务响应**，展示登录、监控、目标执行、完成复核、重规划、停止和模型配置。
 它不是实机 iPhone USB HID 操控成功的录像；视频和播放器均有明确标识。
@@ -48,21 +48,77 @@ https://github.com/user-attachments/assets/9aca96ee-38b1-4d52-847c-96a08fae530e
 
 | 项目 | 本次记录与要求 |
 |---|---|
-| ESP32 开发板 | ESP32-S3 rev. 0.2，实测 **16 MB Flash / 8 MB PSRAM**；品牌与丝印型号未确认 |
+| ESP32 开发板 | **ESP32-S3，16 MB Flash / 8 MB PSRAM**；检测特征对应 **ESP32-S3R8**，芯片修订 v0.2；同规格参考模组：**ESP32-S3-WROOM-1-N16R8** |
 | 被控手机 | **iPhone 13**，Lightning 接口 |
 | 手机 USB 主机转接器 | 需要 Lightning 转 USB 主机/相机适配器；普通充电数据线无法代替 |
 | 网络 | 可访问互联网、支持 ESP32 接入 **2.4 GHz**、允许局域网客户端互访的路由器 |
 | 开发电脑 | MacBook Pro，M1 Pro，16 GB 内存；安装 Xcode 和 Arduino CLI |
 | 数据线与供电 | 使用板子原生 USB/OTG 口和支持数据传输的线；本次通过集线器开发，供电按板卡和适配器规格连接 |
 
-固件当前使用 **8 MB 分区布局**与 **OPI PSRAM**，不会因为物理 Flash 为 16 MB 就自动使用全部容量。
-其他板卡需要先核对 Flash、PSRAM 和原生 USB 接法；USB-to-UART 下载接口不能直接代替 HID 所需的原生 USB 接口。
+#### 型号与核心参数
 
-开发烧录时，板子接 Mac；操作手机时，板子原生 USB 改接到**主机转接器后的 iPhone**，Mac 仅通过 Wi-Fi 监控。
-USB 枚举成功无法自动证明主机是手机：板子仍接 Mac 时，不要确认手机接线或执行指针校准。
+已有检测日志明确记录 `Embedded PSRAM 8MB (AP_3v3)`、QFN56 封装和芯片修订 v0.2，
+对照乐鑫型号表，对应 **ESP32-S3R8** 芯片。可检索的同规格参考模组料号是 **ESP32-S3-WROOM-1-N16R8**：
+16 MB Quad SPI Flash、8 MB Octal SPI PSRAM、板载 PCB 天线。
+这个模组料号用于规格参考，尚未通过当前样机的屏蔽罩或 PCB 丝印确认；整块开发板的品牌/商品型号仍需核对实物。
 
-手机、ESP32 和网页监控端应处于互通的 LAN。手机与 Mac 可以使用路由器的其他 Wi-Fi 频段，前提是允许互访和 mDNS 发现。
-[完整硬件清单与开发/运行接线图 →](docs/guide/hardware.md)
+| 参数 | 规格 / 项目记录 |
+|---|---|
+| 主 CPU | Xtensa 双核 32 位 LX7，最高 240 MHz，另有 ULP 低功耗协处理器 |
+| 片上内存 | 512 KB SRAM、384 KB ROM、16 KB RTC SRAM |
+| Flash | 本板记录为 16 MB；当前固件采用 8 MB 分区布局 |
+| PSRAM | 封装内置 8 MB，3.3 V Octal SPI；固件设置为 `PSRAM=opi` |
+| Wi-Fi | 2.4 GHz，IEEE 802.11 b/g/n |
+| 蓝牙 | Bluetooth 5 LE |
+| 原生 USB | USB 2.0 OTG Full-Speed，本项目用作 HID 鼠标/键盘设备 |
+| 晶振 | 40 MHz，检测日志已记录 |
+
+规格依据：[ESP32-S3 芯片手册](https://documentation.espressif.com/esp32_s3_datasheet_en.pdf)与
+[WROOM-1 / WROOM-1U 模组手册](https://documentation.espressif.com/esp32-s3-wroom-1_wroom-1u_datasheet_en.pdf)。
+
+#### 开发环境接线：编译、烧录与调试
+
+```mermaid
+flowchart LR
+    Mac["Mac：Xcode / Arduino CLI"] -->|"USB 数据连接"| Hub["数据集线器，可选"]
+    Hub --> Board["ESP32-S3 原生 USB / OTG 口"]
+    Mac -->|"USB / Lightning：安装 App"| Phone["iPhone 13"]
+    Board ---|"2.4 GHz Wi-Fi"| LAN["路由器 / 局域网 / 互联网"]
+    Phone ---|"Wi-Fi"| LAN
+    Mac ---|"Wi-Fi"| LAN
+```
+
+- 板子的**原生 USB/OTG 口接 Mac**，可经过支持数据传输的集线器，用于烧录和串口调试；
+  iPhone 另接 Mac，用于签名安装 App。
+- 验证 App 登录、AirPlay、画面解码、网页监控和云端识图时，让板子、手机、Mac 加入互通的 LAN。
+  这套接法中的 USB 主机是 **Mac**。
+- 板子仍接 Mac 时，不要确认“USB 已接到 iPhone”，也不要开始指针校准或发送 HID 动作任务。
+- 当前构建使用 `FlashSize=8M`、`PartitionScheme=default_8MB`、`PSRAM=opi`。
+  物理 Flash 为 16 MB 不会自动扩大固件分区；其他板卡需核对 Flash、PSRAM 和 USB 配置。
+  USB-to-UART 下载接口不能代替 HID 所需的原生 USB 连接。
+
+#### 实际运行接线：操控 iPhone
+
+```mermaid
+flowchart LR
+    Phone["iPhone 13：USB 主机"] --- Adapter["Lightning 转 USB 主机 / 相机适配器"]
+    Adapter ---|"USB 数据线"| Board["ESP32-S3：USB HID 设备"]
+    Power["适配器支持的供电，按需"] -.-> Adapter
+    Phone -->|"同一 LAN 的 AirPlay"| Board
+    Board <-->|"Wi-Fi / HTTPS"| Cloud["云端视觉 API"]
+    Mac["Mac 浏览器：校准 / 可选监控"] -.->|"Wi-Fi HTTP"| Board
+```
+
+- 将板子原生 USB 数据连接从 Mac 拔下，改接到 **iPhone 的 USB 主机转接器**。
+  普通 Lightning 充电数据线无法替代主机转接器；需要额外供电时，按适配器和板卡说明接入。
+- 开启辅助触控和“屏幕镜像 → ESP32 Agent”，在 App 核对并确认真实手机接线，再通过网页校准指针。
+  USB 枚举成功本身不能证明主机是 iPhone。
+- 提交 Goal 后离开手机控制 App。ESP32 负责解码、云端请求和 HID 操作；Mac 作为 Wi-Fi 网页客户端，
+  不需要再用 USB 接板子，也不需要运行 Agent 或 Python 服务。
+- 手机、ESP32 和监控端处于互通的 LAN。ESP32 接入 **2.4 GHz**；手机和 Mac 可以使用其他频段，
+  前提是路由器允许客户端互访和 mDNS 发现。
+
+[完整硬件清单与开发/运行接线说明 →](docs/guide/hardware.md)
 
 ### 项目架构与职责
 
@@ -145,6 +201,7 @@ ios/
   IPhoneAgentTests/                iOS 单元测试
 shared/task-examples.json           网页与 App 示例任务的共享源
 docs/guide/                        完整指南和验证记录
+docs/playbooks/                    可复用的研究性项目开源发布流程
 docs/demo/                         在线播放器、MP4、海报和章节
 tools/demo/                        可重复录制 Demo 的工具
 tools/ci/                          可选 GitHub Actions 测试工作流模板
@@ -232,7 +289,10 @@ App 最低目标为 iOS 18，但构建当前设置跳转代码需要包含 iOS 2
 [业务流程](docs/guide/workflow.md) · [数据流与 API](docs/guide/data-flow.md) ·
 [代码地图](docs/guide/code-map.md) · [安装方法](docs/guide/install.md) ·
 [使用手册](docs/guide/manual.md) · [验证记录](docs/guide/validation.md) ·
-[Demo 重录](docs/demo/README.md)
+[Demo 重录](docs/demo/README.md) ·
+[研究性项目开源发布 Playbook](docs/playbooks/research-open-source-release.md)
+
+Playbook 将本次发布整理为可复用步骤，涵盖事实与验证边界、公开文件审查、双语首页、分语言 Demo、GitHub 发布和匿名播放验收，并附交付记录模板。
 
 ## 来源与许可
 

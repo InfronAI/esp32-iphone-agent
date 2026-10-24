@@ -1,0 +1,64 @@
+{
+  "kind": "simulated-ui-demo",
+  "language": "en",
+  "demo_labels_localized": true,
+  "real_hid": false,
+  "real_model_requests": false,
+  "chapters": [
+    {
+      "at": "0.04",
+      "title": "01 · Architecture",
+      "text": "ESP32 runs the loop. The iPhone app and web console handle setup, tasks, and monitoring."
+    },
+    {
+      "at": "6.69",
+      "title": "02 · Sign in",
+      "text": "DEMO-TOKEN is a sample credential. No real device credentials appear in this video."
+    },
+    {
+      "at": "11.94",
+      "title": "03 · Monitor and trace",
+      "text": "Phone view on the left, execution trace on the right. Clarity first, with a 5-second refresh interval."
+    },
+    {
+      "at": "17.60",
+      "title": "04 · Start with an example",
+      "text": "Choose from 12 read-only goals, plus a screen-reading task that needs no HID control."
+    },
+    {
+      "at": "23.87",
+      "title": "05 · Let the goal guide each step",
+      "text": "Each round combines a fresh frame, recent actions, and the expected result to choose one action."
+    },
+    {
+      "at": "31.95",
+      "title": "05 · Let the goal guide each step",
+      "text": "Each round combines a fresh frame, recent actions, and the expected result to choose one action."
+    },
+    {
+      "at": "40.04",
+      "title": "06 · Verify completion",
+      "text": "An HID acknowledgment alone is insufficient. A new frame must confirm the full goal."
+    },
+    {
+      "at": "50.02",
+      "title": "07 · Start a separate recovery example",
+      "text": "A new simulated task demonstrates recovery from a stall. The completed task stays finished."
+    },
+    {
+      "at": "51.92",
+      "title": "07 · Replan or stop",
+      "text": "Retry and action limits prevent endless loops. Stop takes priority over late model responses."
+    },
+    {
+      "at": "59.66",
+      "title": "08 · Shared model settings",
+      "text": "Endpoint, model, and key are stored on ESP32. This demo uses an example domain and sends no cloud requests."
+    },
+    {
+      "at": "64.39",
+      "title": "09 · Reproducible and transparent",
+      "text": "Fixtures ship with the source. Physical HID operation still needs a host adapter, mirroring, and pointer calibration."
+    }
+  ]
+}

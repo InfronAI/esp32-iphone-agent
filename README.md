@@ -34,12 +34,14 @@ flashing and optional monitoring; it does not run the current agent or decode it
 
 ## Demo and validation boundary
 
-https://github.com/user-attachments/assets/9aca96ee-38b1-4d52-847c-96a08fae530e
+https://github.com/user-attachments/assets/69d47354-60fa-4d0c-ba48-d20356eaeaf3
 
-Press **Play** above to watch the 71-second demo directly in this README.
+Press **Play** above to watch the 71-second **English demo** directly in this README.
 For nine chapter shortcuts, [open the standalone player](https://infronai.github.io/esp32-iphone-agent/demo/).
 
 The video records the **actual dashboard with simulated phone screens and task responses**.
+Captions, dashboard labels, phone content, goals, and execution logs are in English.
+The recording uses a demo translation layer; it does not imply full firmware localization.
 It shows login, monitoring, Goal execution, completion checks, replanning, stopping and model
 configuration. It is not a recording of successful physical iPhone USB HID automation.
 The video and player both identify that boundary. [Recording and reproduction](docs/demo/README.md).
@@ -54,25 +56,81 @@ is currently in Chinese; this English overview provides the same project-level o
 
 | Item | Recorded setup and requirements |
 |---|---|
-| ESP32 board | ESP32-S3 rev. 0.2; measured **16 MB flash / 8 MB PSRAM**; board vendor and printed model unconfirmed |
+| ESP32 board | **ESP32-S3 with 16 MB flash / 8 MB PSRAM**; detected chip features match **ESP32-S3R8**, revision v0.2; matching reference module: **ESP32-S3-WROOM-1-N16R8** |
 | Phone | **iPhone 13**, with a Lightning connector |
 | Phone USB host adapter | Lightning-to-USB host/camera adapter required for this phone; an ordinary charge/data cable is insufficient |
 | Network | Internet-connected router with **2.4 GHz** for the ESP32 and client-to-client LAN access |
 | Development computer | MacBook Pro, M1 Pro, 16 GB RAM; Xcode and Arduino CLI |
 | Cables and power | Data-capable cable to the board's native USB/OTG port; a USB hub was used during development; power must follow the board/adapter specifications |
 
-The firmware uses an **8 MB flash partition layout** and **OPI PSRAM**, even on the measured
-16 MB board. Check those settings against your own board. A USB-to-UART programming port
-is not interchangeable with the native USB port used for HID.
+#### Model identification and core specifications
 
-During development the board connects to the Mac. During phone operation, its native USB
-connects to the **iPhone as USB host through the adapter**, while the Mac monitors over Wi-Fi.
-USB enumeration alone cannot identify the host as an iPhone: do not confirm phone wiring
-or run pointer calibration while the board's HID connection is still attached to the Mac.
+The saved chip-detection log reports `Embedded PSRAM 8MB (AP_3v3)`, QFN56 and revision v0.2.
+Those features match the **ESP32-S3R8** chip in Espressif's part table. **ESP32-S3-WROOM-1-N16R8**
+is a concrete reference module with matching memory: 16 MB Quad SPI flash, 8 MB Octal SPI PSRAM
+and a PCB antenna. This is a reference part, not a verified reading of the current board's module
+or PCB marking. The carrier-board brand/model still needs its physical marking checked.
 
-The phone, ESP32 and monitoring browser share a reachable LAN. The phone and Mac may use
-a different Wi-Fi band if the router permits communication and mDNS discovery.
-[Full hardware list and wiring diagrams →](docs/guide/hardware.md)
+| Parameter | Specification / project record |
+|---|---|
+| Main CPU | Dual-core 32-bit Xtensa LX7, up to 240 MHz; ULP coprocessor |
+| On-chip memory | 512 KB SRAM, 384 KB ROM and 16 KB RTC SRAM |
+| Flash | 16 MB recorded on this board; current firmware uses an 8 MB partition layout |
+| PSRAM | 8 MB in-package, 3.3 V Octal SPI; firmware setting `PSRAM=opi` |
+| Wi-Fi | 2.4 GHz, IEEE 802.11 b/g/n |
+| Bluetooth | Bluetooth 5 LE |
+| Native USB | USB 2.0 OTG Full-Speed; used as a HID mouse/keyboard device in this project |
+| Crystal | 40 MHz, reported in the detection log |
+
+Specification sources: [ESP32-S3 chip datasheet](https://documentation.espressif.com/esp32_s3_datasheet_en.pdf)
+and [WROOM-1 / WROOM-1U module datasheet](https://documentation.espressif.com/esp32-s3-wroom-1_wroom-1u_datasheet_en.pdf).
+
+#### Development wiring: build, flash and debug
+
+```mermaid
+flowchart LR
+    Mac["Mac: Xcode / Arduino CLI"] -->|"USB data"| Hub["Data hub, optional"]
+    Hub --> Board["ESP32-S3 native USB / OTG"]
+    Mac -->|"USB / Lightning: install the app"| Phone["iPhone 13"]
+    Board ---|"2.4 GHz Wi-Fi"| LAN["Router / LAN / Internet"]
+    Phone ---|"Wi-Fi"| LAN
+    Mac ---|"Wi-Fi"| LAN
+```
+
+- Connect the board's **native USB/OTG port to the Mac**, directly or through a data hub,
+  for flashing and serial diagnostics. Connect the iPhone to the Mac separately to install the app.
+- Join the board, phone and Mac to a reachable LAN when checking login, AirPlay, decoding,
+  dashboard monitoring and cloud vision. The USB host in this arrangement is the **Mac**.
+- Do not confirm the phone USB connection, start pointer calibration or send HID task actions
+  while the board's HID connection is attached to the Mac.
+- The current build selects `FlashSize=8M`, `PartitionScheme=default_8MB` and `PSRAM=opi`.
+  A physical 16 MB chip does not automatically expand the partition layout. Other boards must
+  match the flash, PSRAM and USB configuration; a USB-to-UART port does not provide the native HID connection.
+
+#### Runtime wiring: operate the iPhone
+
+```mermaid
+flowchart LR
+    Phone["iPhone 13: USB host"] --- Adapter["Lightning-to-USB host / camera adapter"]
+    Adapter ---|"USB data cable"| Board["ESP32-S3: USB HID device"]
+    Power["Adapter-supported power, if needed"] -.-> Adapter
+    Phone -->|"AirPlay over the same LAN"| Board
+    Board <-->|"Wi-Fi / HTTPS"| Cloud["Vision API"]
+    Mac["Mac browser: calibration / optional monitoring"] -.->|"Wi-Fi HTTP"| Board
+```
+
+- Move the board's native USB data connection from the Mac to the **iPhone's USB host adapter**.
+  An ordinary Lightning charge/data cable cannot replace that adapter. Add power only as supported
+  by the adapter and board.
+- Enable AssistiveTouch and Screen Mirroring → **ESP32 Agent**, confirm the physical phone wiring
+  in the app, then calibrate the pointer from the web dashboard. USB enumeration alone does not
+  establish that the connected host is the phone.
+- Submit a Goal and leave the controller app. The ESP32 handles decoding, cloud requests and HID;
+  the Mac is a Wi-Fi browser client and need not stay connected by USB or run an agent/server.
+- The phone, ESP32 and any monitoring client share a reachable LAN. The ESP32 uses **2.4 GHz**;
+  the phone/Mac can use another band if the router allows communication and mDNS discovery.
+
+[Full hardware list and development/runtime wiring →](docs/guide/hardware.md)
 
 ### Architecture and responsibilities
 
@@ -166,6 +224,7 @@ ios/
   IPhoneAgentTests/                iOS unit tests
 shared/task-examples.json           Shared source for web and iPhone task examples
 docs/guide/                        Full guides and validation records
+docs/playbooks/                    Reusable research-project publication workflow
 docs/demo/                         Online player, MP4, poster and chapters
 tools/demo/                        Reproducible demo recording tools
 tools/ci/                          Optional GitHub Actions test workflow template
@@ -262,7 +321,11 @@ GitHub Pages publishes the online video separately.
 [Business flow](docs/guide/workflow.md) · [Data flow and API](docs/guide/data-flow.md) ·
 [Code map](docs/guide/code-map.md) · [Installation](docs/guide/install.md) ·
 [User manual](docs/guide/manual.md) · [Validation](docs/guide/validation.md) ·
-[Demo reproduction](docs/demo/README.md)
+[Demo reproduction](docs/demo/README.md) ·
+[Research open-source publication playbook (Chinese)](docs/playbooks/research-open-source-release.md)
+
+The publication playbook captures fact checking, safe file selection, bilingual documentation,
+localized demos, GitHub publishing, and anonymous playback checks, with a reusable delivery template.
 
 ## Source and licensing
 

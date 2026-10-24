@@ -23,6 +23,8 @@
     .eyebrow { color: #227451; font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
     h1 { font-size: clamp(28px, 4vw, 42px); line-height: 1.15; letter-spacing: -.04em; margin: 12px 0; }
     .intro p:last-child { color: #626973; line-height: 1.6; max-width: 800px; margin-bottom: 0; }
+    .languages { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; font-size: 14px; margin: 0 0 18px; color: #626973; }
+    .languages a[aria-current="true"] { font-weight: 700; color: #20242b; text-decoration: none; }
     .player { overflow: hidden; border: 1px solid #dce1e9; border-radius: 18px; background: #11161f; box-shadow: 0 12px 32px #17233810; }
     video { display: block; width: 100%; aspect-ratio: 8 / 5; max-height: 76vh; object-fit: contain; background: #11161f; }
     .player-footer { display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; padding: 14px 18px; background: #fff; color: #626973; font-size: 14px; line-height: 1.5; }
@@ -60,15 +62,16 @@
       <h1>See the Goal loop in action.</h1>
       <p>Follow the dashboard from a task request through observation, decisions, completion checks, and replanning.</p>
     </div>
+    <nav class="languages" aria-label="Video language"><span>Video language</span><a href="?lang=en" data-language="en" lang="en">English</a><a href="?lang=zh-CN" data-language="zh-CN" lang="zh-CN">简体中文</a></nav>
     <div class="player">
-      <video id="demo" controls playsinline preload="metadata" poster="poster.jpg" aria-label="ESP32 iPhone Agent dashboard demo" aria-describedby="demo-note">
-        <source src="demo.mp4" type="video/mp4">
-        Your browser does not support embedded video. <a href="demo.mp4">Open the MP4 video</a>.
+      <video id="demo" controls playsinline preload="metadata" poster="poster.en.jpg" aria-label="ESP32 iPhone Agent dashboard demo" aria-describedby="demo-note">
+        <source src="demo.en.mp4" type="video/mp4">
+        Your browser does not support embedded video. <a href="demo.en.mp4" data-video-link>Open the MP4 video</a>.
       </video>
-      <div class="player-footer"><span>71 seconds · 1440 × 900 · Silent video · Chinese on-screen captions</span><a href="demo.mp4" download>Download MP4</a></div>
+      <div class="player-footer"><span id="video-meta">About 71 seconds · 1440 × 900 · Silent video · English interface and captions</span><a href="demo.en.mp4" data-video-link download>Download MP4</a></div>
     </div>
-    <p id="playback-error" role="status" hidden>Video playback could not start. Try the native play button, or <a href="demo.mp4">open the MP4 directly</a>.</p>
-    <p class="notice" id="demo-note"><strong>Actual dashboard, simulated phone and task data.</strong> This video demonstrates the interface and Goal loop; it is not a recording of physical iPhone USB HID automation. <a href="https://github.com/InfronAI/esp32-iphone-agent/blob/main/docs/guide/validation.md">Read the validation record</a>.</p>
+    <p id="playback-error" role="status" hidden>Video playback could not start. Try the native play button, or <a href="demo.en.mp4" data-video-link>open the MP4 directly</a>.</p>
+    <p class="notice" id="demo-note"><strong>Actual dashboard, simulated phone and task data.</strong> The English recording uses translated demo labels; firmware localization is not implied. This video demonstrates the interface and Goal loop; it is not a recording of physical iPhone USB HID automation. <a href="https://github.com/InfronAI/esp32-iphone-agent/blob/main/docs/guide/validation.md">Read the validation record</a>.</p>
     <section id="chapter-section" aria-labelledby="chapter-heading" hidden>
       <h2 id="chapter-heading">Jump to a chapter</h2>
       <ol id="chapters"></ol>
@@ -81,10 +84,22 @@
   <script>
     const video = document.getElementById('demo');
     const error = document.getElementById('playback-error');
+    const language = new URLSearchParams(location.search).get('lang') === 'zh-CN' ? 'zh-CN' : 'en';
+    const suffix = language === 'en' ? '.en' : '';
+    video.poster = 'poster' + suffix + '.jpg';
+    video.querySelector('source').src = 'demo' + suffix + '.mp4';
+    for (const link of document.querySelectorAll('[data-video-link]')) link.href = 'demo' + suffix + '.mp4';
+    document.querySelector('[data-language="' + language + '"]').setAttribute('aria-current', 'true');
+    function updateMetadata() {
+      const duration = Number.isFinite(video.duration) ? Math.round(video.duration) : 71;
+      document.getElementById('video-meta').textContent = duration + ' seconds · 1440 × 900 · Silent video · ' + (language === 'en' ? 'English interface and captions' : 'Chinese interface and captions');
+    }
+    video.addEventListener('loadedmetadata', updateMetadata);
+    updateMetadata(); video.load();
     video.addEventListener('error', () => { error.hidden = false; });
     video.addEventListener('playing', () => { error.hidden = true; });
     const names = { '01': 'Architecture', '02': 'Sign in', '03': 'Live monitoring', '04': 'Task examples', '05': 'Goal loop', '06': 'Verify completion', '07': 'Replan & stop', '08': 'Model settings', '09': 'Validation' };
-    fetch('chapters.json').then(response => {
+    fetch('chapters' + suffix + '.json').then(response => {
       if (!response.ok) throw new Error('Chapters unavailable');
       return response.json();
     }).then(data => {

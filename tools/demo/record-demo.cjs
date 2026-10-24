@@ -2,11 +2,15 @@
 const fs=require('node:fs');
 const path=require('node:path');
 const {spawnSync}=require('node:child_process');
+const args=process.argv.slice(2);
+if(args.length && (args.length!==2 || args[0]!=='--lang'))throw Error('Usage: node record-demo.cjs [--lang en|zh-CN]');
+const language=args[1]||'zh-CN',suffix=language==='en'?'.en':'';
+const localize=require('./localize.cjs').createLocalizer(language);
 const root=path.resolve(__dirname,'../..'),out=path.join(root,'docs/demo'),work=path.join(root,'build/demo');
 fs.mkdirSync(out,{recursive:true});fs.mkdirSync(work,{recursive:true});
 const {chromium}=require('playwright');
 
-const html=fs.readFileSync(path.join(root,'hardware/hid_bridge/src/cloud/control_page.h'),'utf8').split('R"HTML(')[1].split(')HTML";')[0];
+const html=localize(fs.readFileSync(path.join(root,'hardware/hid_bridge/src/cloud/control_page.h'),'utf8').split('R"HTML(')[1].split(')HTML";')[0]);
 const icons=fs.readFileSync(path.join(root,'hardware/hid_bridge/src/cloud/control_icons.h'),'utf8');
 const icon=Buffer.from(icons.split('CLOUD_ICON_PNG[] PROGMEM = {')[1].split('};')[0].match(/0x[0-9a-f]{2}/g).map(Number));
 const escape=s=>s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');
@@ -29,14 +33,14 @@ const outro=card('观察 → 决策 → 操作 → 验证','已实现短期记�
  function event(kind,title,detail,step=status.steps){const e={id:++trace.revision,at_ms:1000+trace.revision*1200,step,kind,title,detail,duration_ms:kind==='decision'?1800:0};trace.events.push(e);status.trace_revision=trace.revision;}
  await page.route('**/*',async route=>{
   const u=new URL(route.request().url());if(u.hostname!=='demo.test')throw Error('External request forbidden: '+u.hostname);
-  if(u.pathname==='/intro'||u.pathname==='/outro')return route.fulfill({contentType:'text/html',body:u.pathname==='/intro'?intro:outro});
+  if(u.pathname==='/intro'||u.pathname==='/outro')return route.fulfill({contentType:'text/html',body:localize(u.pathname==='/intro'?intro:outro)});
   if(u.pathname==='/')return route.fulfill({contentType:'text/html',body:html});
   if(u.pathname.endsWith('.png')||u.pathname==='/favicon.ico')return route.fulfill({contentType:'image/png',body:icon});
   if(u.pathname==='/api/health')return route.fulfill({json:{service:'esp32-agent',wifi_connected:true}});
   if(route.request().headers().authorization!=='Bearer DEMO-TOKEN')return route.fulfill({status:401,body:'Control token required'});
-  if(u.pathname==='/api/status'){status.uptime_ms+=100;return route.fulfill({json:status});}
-  if(u.pathname==='/api/trace')return route.fulfill({json:trace});
-  if(u.pathname==='/api/snapshot')return route.fulfill({contentType:'image/svg+xml',headers:{'X-Frame-Age-Ms':'50','X-Frame-At-Ms':String(Date.now())},body:phone(frame)});
+  if(u.pathname==='/api/status'){status.uptime_ms+=100;return route.fulfill({json:localize(status)});}
+  if(u.pathname==='/api/trace')return route.fulfill({json:localize(trace)});
+  if(u.pathname==='/api/snapshot')return route.fulfill({contentType:'image/svg+xml',headers:{'X-Frame-Age-Ms':'50','X-Frame-At-Ms':String(Date.now())},body:localize(phone(frame))});
   if(u.pathname==='/api/config')return route.fulfill({json:config});
   if(u.pathname==='/api/start'){
    trace={revision:0,run_id:1,started_ms:1000,goal:route.request().postDataJSON().goal,dropped:0,events:[]};status={...status,running:true,state:'starting',steps:0,harness:{}};event('input','收到任务',trace.goal,0);return route.fulfill({body:'ok'});
@@ -45,33 +49,34 @@ const outro=card('观察 → 决策 → 操作 → 验证','已实现短期记�
   throw Error('Demo does not implement '+u.pathname);
  });
  async function caption(title,text){
+  title=localize(title);text=localize(text);
   notes.push({at:((Date.now()-began)/1000).toFixed(2),title,text});
-  await page.evaluate(({title,text})=>{let badge=document.getElementById('demo-watermark');if(!badge){badge=document.createElement('div');badge.id='demo-watermark';badge.style.cssText='position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:99999;background:#172238;color:white;font:600 13px -apple-system,sans-serif;padding:8px 16px;border-radius:30px;pointer-events:none';document.body.append(badge);}badge.textContent='界面与任务模拟演示 · 非真机 HID 操控录像';let el=document.getElementById('demo-caption');if(!el){el=document.createElement('div');el.id='demo-caption';el.style.cssText='position:fixed;bottom:10px;left:32px;right:32px;z-index:99999;border-radius:14px;background:rgba(18,27,43,.96);color:white;padding:14px 22px;font:16px/1.6 -apple-system,sans-serif;box-shadow:0 8px 28px #0003;pointer-events:none';document.body.append(el);}el.replaceChildren();const h=document.createElement('strong');h.textContent=title+'  ';h.style.color='#9ec5ff';const p=document.createElement('span');p.textContent=text;el.append(h,p);},{title,text});
+  await page.evaluate(({title,text,watermark})=>{let badge=document.getElementById('demo-watermark');if(!badge){badge=document.createElement('div');badge.id='demo-watermark';badge.style.cssText='position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:99999;background:#172238;color:white;font:600 13px -apple-system,sans-serif;padding:8px 16px;border-radius:30px;pointer-events:none';document.body.append(badge);}badge.textContent=watermark;let el=document.getElementById('demo-caption');if(!el){el=document.createElement('div');el.id='demo-caption';el.style.cssText='position:fixed;bottom:10px;left:32px;right:32px;z-index:99999;border-radius:14px;background:rgba(18,27,43,.96);color:white;padding:14px 22px;font:16px/1.6 -apple-system,sans-serif;box-shadow:0 8px 28px #0003;pointer-events:none';document.body.append(el);}el.replaceChildren();const h=document.createElement('strong');h.textContent=title+'  ';h.style.color='#9ec5ff';const p=document.createElement('span');p.textContent=text;el.append(h,p);},{title,text,watermark:localize('界面与任务模拟演示 · 非真机 HID 操控录像')});
  }
- async function hold(ms){const end=Date.now()+ms;do{const file=path.join(framesDir,String(frames.length).padStart(5,'0')+'.png');await page.screenshot({path:file});frames.push({file,at:Date.now()});await page.waitForTimeout(120);}while(Date.now()<end);}
+ async function hold(ms){const end=Date.now()+ms;do{const file=path.join(framesDir,String(frames.length).padStart(5,'0')+'.png');if(language==='en'){const visible=await page.evaluate(()=>document.body.innerText+' '+[...document.querySelectorAll('input,textarea')].map(el=>el.value).join(' '));if(/\p{Script=Han}/u.test(visible))throw Error('Chinese text in English recording');}await page.screenshot({path:file});frames.push({file,at:Date.now()});await page.waitForTimeout(120);}while(Date.now()<end);}
  try{
   await page.goto('http://demo.test/intro');await caption('01 · 架构','ESP32 独立执行循环，iPhone App 与网页负责配置、任务和监控。');await hold(6500);
   await page.goto('http://demo.test/');await caption('02 · 先登录，再看真实状态','演示令牌为 DEMO-TOKEN；这里没有任何真实设备凭据。');await hold(1500);await page.locator('#token').fill('DEMO-TOKEN');await hold(1000);await page.locator('#connect').click();await page.waitForSelector('#dashboard:not([hidden])');await hold(2500);
   await caption('03 · 首屏同时看画面和进展','左侧监控，右侧执行详情；清晰优先，默认每 5 秒刷新。');await hold(5500);
   await page.locator('#task-form').scrollIntoViewIfNeeded();await caption('04 · 从示例快速开始','12 个常用只读目标，网页另有无需 HID 的“读懂当前屏幕”。');await hold(4500);
-  await page.locator('#goal').fill('打开设置的 Wi-Fi 页面，告诉我当前连接的网络名称。只查看，不修改设置。');await hold(1500);await Promise.all([page.waitForResponse(r=>new URL(r.url()).pathname==='/api/start'),page.locator('#start').click()]);await page.evaluate(()=>scrollTo(0,0));
+  await page.locator('#goal').fill(localize('打开设置的 Wi-Fi 页面，告诉我当前连接的网络名称。只查看，不修改设置。'));await hold(1500);await Promise.all([page.waitForResponse(r=>new URL(r.url()).pathname==='/api/start'),page.locator('#start').click()]);await page.evaluate(()=>scrollTo(0,0));
   const rounds=[{n:1,frame:'home',obs:'主屏幕可见设置入口',summary:'尚未到达目标页面',subgoal:'打开设置',expected:'出现设置列表',action:{action:'tap',x:.24,y:.3}},
    {n:2,frame:'settings',obs:'设置页面可见 Wi-Fi 入口',summary:'已打开设置',subgoal:'进入 Wi-Fi 页面',expected:'显示当前已连接的网络',action:{action:'tap',x:.5,y:.26}}];
   for(const r of rounds){frame=r.frame;status={...status,state:'thinking',steps:r.n-1,harness:{phase:'decide',round:r.n,round_limit:40,actions:r.n-1,action_limit:20,summary:r.summary,subgoal:r.subgoal,expected:r.expected,observation:r.obs,feedback:'',verifying:false}};event('request','发送画面与目标',`模拟输入：原始 Goal + 当前截图 + 最近动作记录\n子目标：${r.subgoal}`,r.n);event('decision','模型观察与动作选择',JSON.stringify({...r.action,observation:r.obs,summary:r.summary,subgoal:r.subgoal,expected:r.expected,progress:r.n===1?'unknown':'advanced',reason:'依据当前画面，进入目标信息所在页面。'}),r.n);await caption('05 · Goal 驱动下一步','每轮结合新画面、最近动作与预期结果，选择一个动作。');await hold(2800);status.state='acting';status.steps=r.n;status.harness.phase='act';event('action','执行选定动作',JSON.stringify(r.action));await hold(2400);status.state='thinking';status.harness.phase='observe';event('action_result','HID 已确认，等待画面验证','模拟命令确认；尚不能视为目标完成。');await hold(2400);}
   frame='wifi';status={...status,state:'thinking',harness:{...status.harness,phase:'verify',round:3,summary:'Wi-Fi 页面显示当前网络 Infron Demo',subgoal:'复核已读取的网络名称',expected:'新截图仍显示同一连接状态',verifying:true}};event('verify','候选完成，等待新画面复核','模拟观察：已连接 Infron Demo；需要另一张新图再确认。');await caption('06 · 完成也要验证','HID 确认不是成功；候选完成后，再取一张新画面复核整个 Goal。');await hold(5000);
-  status={...status,state:'done',running:false,detail:'当前连接的 Wi-Fi 名称：Infron Demo。未修改设置。',harness:{...status.harness,phase:'done',round:4,verifying:false}};event('result','done',status.detail);await hold(2800);await page.screenshot({path:path.join(out,'poster.jpg'),type:'jpeg',quality:85});await hold(2000);
+  status={...status,state:'done',running:false,detail:'当前连接的 Wi-Fi 名称：Infron Demo。未修改设置。',harness:{...status.harness,phase:'done',round:4,verifying:false}};event('result','done',status.detail);await hold(2800);await page.screenshot({path:path.join(out,'poster'+suffix+'.jpg'),type:'jpeg',quality:85});await hold(2000);
   await caption('07 · 再发一个目标，演示异常分支','以下使用新的模拟任务，展示卡住后的处理，不是已完成任务继续操作。');
-  await page.locator('#task-form').scrollIntoViewIfNeeded();await page.locator('#goal').fill('回到主屏幕，然后打开设置。只导航，不修改配置。');await hold(1800);await Promise.all([page.waitForResponse(r=>new URL(r.url()).pathname==='/api/start'),page.locator('#start').click()]);await page.evaluate(()=>scrollTo(0,0));
+  await page.locator('#task-form').scrollIntoViewIfNeeded();await page.locator('#goal').fill(localize('回到主屏幕，然后打开设置。只导航，不修改配置。'));await hold(1800);await Promise.all([page.waitForResponse(r=>new URL(r.url()).pathname==='/api/start'),page.locator('#start').click()]);await page.evaluate(()=>scrollTo(0,0));
   event('action','执行选定动作','{"action":"home"}',1);event('observe','验证结果','模拟结果：画面没有改变。',1);event('action','执行选定动作','{"action":"home"}',2);event('observe','验证结果','模拟结果：画面仍未改变，阻止继续重复。',2);
   status={...status,running:true,state:'thinking',steps:2,detail:'检测到动作没有取得进展，正在调整策略。',harness:{...status.harness,phase:'replan',round:3,round_limit:40,summary:'演示另一条异常分支：重复动作没有改变页面',subgoal:'选择其他路径或报告阻塞',feedback:'不会持续重复无效点击。'}};event('replan','调整执行策略','模拟分支：重复无效动作被拦截，先重新规划。');await caption('07 · 卡住重规划，随时可停止','有限重试和执行上限防止无限循环；用户停止优先于迟到响应。');await hold(4000);await page.locator('#stop').click();await hold(3500);
-  await page.getByRole('button',{name:'云端模型配置',exact:true}).click();await caption('08 · 两端共用云端配置','Endpoint、模型和 Key 保存在板子；演示使用 example 域名，不发送网络请求。');await hold(4500);await page.locator('[data-action="close"]').click();
+  await page.getByRole('button',{name:localize('云端模型配置'),exact:true}).click();await caption('08 · 两端共用云端配置','Endpoint、模型和 Key 保存在板子；演示使用 example 域名，不发送网络请求。');await hold(4500);await page.locator('[data-action="close"]').click();
   await page.goto('http://demo.test/outro');await caption('09 · 可公开、可复现','模拟素材随源码发布；真机 HID 闭环需要主机转接器、镜像和指针校准。');await hold(6500);
   if(errors.length)throw Error(errors.join('\n'));
   await ctx.close();
   const concat=path.join(framesDir,'frames.txt');
   fs.writeFileSync(concat,frames.map((f,i)=>`file '${path.basename(f.file)}'\nduration ${((frames[i+1]?.at??f.at+120)-f.at)/1000}\n`).join('')+`file '${path.basename(frames.at(-1).file)}'\n`);
-  const enc=spawnSync(process.env.DEMO_FFMPEG||'ffmpeg',['-y','-v','error','-f','concat','-safe','0','-i',concat,'-r','25','-c:v','libx264','-preset','medium','-crf','23','-pix_fmt','yuv420p','-movflags','+faststart','-an',path.join(out,'demo.mp4')],{stdio:'inherit'});if(enc.status!==0)throw Error('ffmpeg conversion failed');
-  fs.writeFileSync(path.join(out,'chapters.json'),JSON.stringify({kind:'simulated-ui-demo',real_hid:false,real_model_requests:false,chapters:notes},null,2)+'\n');
-  console.log('Demo generated; all phone frames and responses are synthetic; no device/API/HID calls.');
+  const enc=spawnSync(process.env.DEMO_FFMPEG||'ffmpeg',['-y','-v','error','-f','concat','-safe','0','-i',concat,'-r','25','-c:v','libx264','-preset','medium','-crf','23','-pix_fmt','yuv420p','-movflags','+faststart','-an',path.join(out,'demo'+suffix+'.mp4')],{stdio:'inherit'});if(enc.status!==0)throw Error('ffmpeg conversion failed');
+  fs.writeFileSync(path.join(out,'chapters'+suffix+'.json'),JSON.stringify({kind:'simulated-ui-demo',language,demo_labels_localized:language==='en',real_hid:false,real_model_requests:false,chapters:notes},null,2)+'\n');
+  console.log(language+': Demo generated; all phone frames and responses are synthetic; no device/API/HID calls.');
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});
