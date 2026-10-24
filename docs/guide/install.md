@@ -168,4 +168,4 @@ Demo 录制方法见 [Demo 文档](../demo/README.md)。
 ## 8. 启用 GitHub Actions（可选）
 
 [CI 模板和启用说明](../../tools/ci/README.md)包含固件、iOS、Harness、网页和 Python 测试。
-需要具备工作流写入权限的 GitHub 授权后再复制到 `.github/workflows/ci.yml`；当前发布没有启用远程 Actions。
+需要具备工作流写入权限的 GitHub 授权后再复制到 `.github/workflows/ci.yml`；当前没有启用此测试工作流。

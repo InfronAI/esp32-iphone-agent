@@ -1,8 +1,8 @@
 # Demo：网页监控与 Goal 循环
 
-[观看 / 下载 MP4](demo.mp4) · [返回项目](../../README.zh-CN.md)
+[▶ 在线播放视频](https://infronai.github.io/esp32-iphone-agent/demo/) · [下载 MP4](demo.mp4) · [返回项目](../../README.zh-CN.md)
 
-[![演示海报](poster.jpg)](demo.mp4)
+[![演示海报](poster.jpg)](https://infronai.github.io/esp32-iphone-agent/demo/)
 
 ## 这段视频展示什么
 
@@ -16,6 +16,14 @@
 “停止”等交互是实际网页逻辑，服务响应由本地夹具提供。
 
 真实已经验证的能力与待补充项见[验证说明](../guide/validation.md)。
+
+## 在线播放器
+
+[打开在线视频](https://infronai.github.io/esp32-iphone-agent/demo/)。原生播放器支持播放/暂停、拖动进度、全屏和移动端内联播放；章节按钮按 `chapters.json` 跳转。
+视频与页面由同一仓库的 GitHub Pages 提供，不需要下载或登录。
+
+播放器源码为 `docs/demo/index.html`。GitHub Pages 从 `main` 分支的 `/docs` 发布，`docs/.nojekyll` 保留静态文件原样。
+修改页面、视频或章节后推送至 `main`，等待 Pages 部署完成即可更新；这个发布流程与 `tools/ci` 中尚未启用的测试工作流分开。
 
 ## 重录
 

@@ -47,7 +47,7 @@ GitHub Actions 工作流作为[模板](../../tools/ci/README.md)提供，尚未�
 
 ## Demo 的性质
 
-[演示 MP4](../demo/demo.mp4)使用真正的 `control_page.h` 页面，拦截全部网络请求并提供公开的模拟数据。
+[在线演示](https://infronai.github.io/esp32-iphone-agent/demo/)使用真正的 `control_page.h` 页面，拦截全部网络请求并提供公开的模拟数据。
 所有手机屏幕、任务结果、进展和动作都是演示夹具；视频全程标注这一点。
 它展示当前 UI 与交互流程，不作为 USB 实机验收录像。
 

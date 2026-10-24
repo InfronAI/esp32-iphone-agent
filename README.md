@@ -5,7 +5,7 @@
 
 **A Goal-driven iPhone automation controller running on an ESP32-S3.**
 
-[简体中文](README.zh-CN.md) · [Documentation](docs/guide/README.md) · [Demo video](docs/demo/demo.mp4)
+[简体中文](README.zh-CN.md) · [Documentation](docs/guide/README.md) · [Watch demo online](https://infronai.github.io/esp32-iphone-agent/demo/)
 
 </div>
 
@@ -83,9 +83,9 @@ independently of dashboard login. IP addresses come from DHCP, not a hard-coded 
 
 ## Demo and validation boundary
 
-[![Dashboard demo — simulated phone task](docs/demo/poster.jpg)](docs/demo/demo.mp4)
+[![Dashboard demo — simulated phone task](docs/demo/poster.jpg)](https://infronai.github.io/esp32-iphone-agent/demo/)
 
-[Watch/download the MP4](docs/demo/demo.mp4). The video records the actual web UI
+[▶ Watch the demo online](https://infronai.github.io/esp32-iphone-agent/demo/). The player supports seeking, full screen, and chapter navigation. The video records the actual web UI
 with synthetic phone screens and mocked task events. It is **not a recording of
 successful physical iPhone HID automation**. The overlay identifies this throughout.
 Firmware flashing, decoder regression, cloud response parsing, controller tests

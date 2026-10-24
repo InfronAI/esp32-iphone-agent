@@ -2,7 +2,7 @@
 
 **在 ESP32-S3 上完成“观察 → 决策 → 操作 → 验证”的 iPhone Goal 执行循环。**
 
-[English](README.md) · [完整文档](docs/guide/README.md) · [演示视频](docs/demo/demo.mp4)
+[English](README.md) · [完整文档](docs/guide/README.md) · [在线观看 Demo](https://infronai.github.io/esp32-iphone-agent/demo/)
 
 当前版本让 ESP32 自己接收 iPhone 屏幕镜像、解码 H.264、生成灰度 JPEG、调用云端视觉模型，
 然后通过 USB HID 鼠标和键盘操作手机。iPhone App 负责手机配置与任务提交；网页负责监控手机画面和每轮执行详情。
@@ -13,9 +13,11 @@
 
 ## 先看效果
 
-[![网页控制台与 Goal 循环演示](docs/demo/poster.jpg)](docs/demo/demo.mp4)
+[![网页控制台与 Goal 循环演示](docs/demo/poster.jpg)](https://infronai.github.io/esp32-iphone-agent/demo/)
 
-[观看/下载 MP4](docs/demo/demo.mp4) · [章节与重录方法](docs/demo/README.md)
+[▶ 在线播放视频](https://infronai.github.io/esp32-iphone-agent/demo/) · [章节与重录方法](docs/demo/README.md)
+
+播放器支持拖动进度、全屏和章节跳转，无需下载文件。
 
 视频使用**真实网页代码 + 模拟手机画面和任务响应**，全程有标识。它展示登录、监控、任务输入、
 执行进展、完成复核、停止和模型配置，**不代表真机 USB HID 操控全流程已经验证成功**。
